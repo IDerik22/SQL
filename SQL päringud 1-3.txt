@@ -1,0 +1,38 @@
+SQL päringu keel 1
+
+sqlite3 epood_eteppan; - Teeb andmebaasi nimega epood_eteppan
+
+CREATE TABLE eteppan (  - Teeb tabeli nimega eteppan
+
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+first_name VARCHAR(255), - VARCHAR määrab mitu tähte saab olla sisus
+last_name VARCHAR(255),
+email VARCHAR(255),
+car_make VARCHAR(255),
+car_model VARCHAR(255),
+car_year INTEGER,
+ car_price REAL(10,2)
+);
+
+INSERT INTO eteppan (first_name, last_name, email, car_make, car_model, car_year, car_price) - Sisteb uued read tabelisse
+VALUES 
+
+('John', 'Doe', 'johndoe@gmail.com', 'Honda', 'Civic', 2022, 22000.00), - esimine rida
+('Jane', 'Doe', 'janedoe@gmail.com', 'Toyota', 'Corolla', 2021, 19000.00), - teine rida
+('Erik', 'Teppan', 'erik.teppan2004@gmail.com.', 'Tesla', 'Model 3', 2023, 50000.00); - kolmas rida
+
+SELECT * FROM eteppan; - Kuvab kõik andmed
+
+
+.mode csv
+.import /Users/it21/Downloads/MOCK_DATA.csv eteppan
+
+tõestus kuskilt:
+864,Ina,Deacock,ideacocknz@163.com,Suzuki,SX4,75.209.201.142,40285059.0
+865,Glori,Bertelsen,gbertelseno0@deviantart.com,Ford,GT500,76.95.115.115,45203215.0
+866,Frasco,Kilbourne,fkilbourneo1@goo.gl,Mercedes-Benz,CL-Class,141.252.237.197,94201627.0
+867,Minne,Posse,mposseo2@symantec.com,Cadillac,"Escalade EXT",171.116.90.240,91981413.0
+
+SQL päringu keel 2
+
