@@ -1,6 +1,19 @@
 SQL päringu keel 1
 
+1. loo andmebaas nime epood_sinukasutaja (kasutaja sama mis liivakastis näiteks epood_mmetshein)
+
 sqlite3 epood_eteppan; - Teeb andmebaasi nimega epood_eteppan
+
+2. loo tabel sinukasutaja (näiteks mmetshein) 
+	tekita väljad (veerud) andmete hoidmiseks kindla andmetüübiga:
+	id (täisarv, automaatselt suureneb, primaarvõti)
+	first_name (sümbolid, 255 märki)
+	last_name  (sümbolid, 255 märki)
+	email (sümbolid, 255 märki)
+	car_make (sümbolid, 255 märki)
+	car_model (sümbolid, 255 märki)
+	car_year (aasta)
+	car_price (komaarv, 2 komakohta)
 
 CREATE TABLE eteppan (  - Teeb tabeli nimega eteppan
 
@@ -14,6 +27,7 @@ car_model VARCHAR(255),
 car_year INTEGER,
  car_price REAL(10,2)
 );
+3. Lisa vähemalt 3 kliendi andmed, millest üks oled sina.
 
 INSERT INTO eteppan (first_name, last_name, email, car_make, car_model, car_year, car_price) - Sisteb uued read tabelisse
 VALUES 
@@ -22,9 +36,10 @@ VALUES
 ('Jane', 'Doe', 'janedoe@gmail.com', 'Toyota', 'Corolla', 2021, 19000.00), - teine rida
 ('Erik', 'Teppan', 'erik.teppan2004@gmail.com.', 'Tesla', 'Model 3', 2023, 50000.00); - kolmas rida
 
+4. Kuva kõik andmed
 SELECT * FROM eteppan; - Kuvab kõik andmed
 
-
+5. Mine lehele https://www.mockaroo.com ja genereeri samad andmed 1000tk ja impordi need oma andmebaasi.
 .mode csv
 .import /Users/it21/Downloads/MOCK_DATA.csv eteppan
 
@@ -36,3 +51,147 @@ tõestus kuskilt:
 
 SQL päringu keel 2
 
+sqlite3 epood_eteppan; -andmebaasi avamiseks
+
+1. Muuda enda lisatud automargiks Zaporožets
+
+SELECT id, last_name, car_make - valib välja kindlad tabelid veerud
+FROM eteppan - valib mis tabelist
+WHERE last_name = 'Teppan';  - otsib tabelist üles kus las_name = Teppan
+
+2. Muuda kõik Cadillac margid Citroën’iks
+
+UPDATE car_make - värskendab kindla id järgi auto marki
+SET car_make = 'Zaporozhets'
+WHERE id = 4;
+
+tõestus:
+4|Teppan|Zaporozhets
+
+3. Muuda kõik Cadillac margid Citroën’iks
+
+UPDATE eteppan
+SET car_make = 'Citroën'
+WHERE car_make = 'Cadillac';
+
+tõestus:
+
+SELECT id, car_make
+FROM eteppan
+WHERE car_make = 'Citroën';
+
+12|Citro?n
+67|Citro?n
+171|Citro?n
+176|Citro?n
+276|Citro?n
+281|Citro?n
+351|Citro?n
+378|Citro?n
+416|Citro?n
+456|Citro?n
+469|Citro?n
+475|Citro?n
+543|Citro?n
+595|Citro?n
+605|Citro?n
+661|Citro?n
+709|Citro?n
+744|Citro?n
+788|Citro?n
+829|Citro?n
+867|Citro?n
+964|Citro?n
+973|Citro?n
+987|Citro?n
+
+4. Kustuta ära read, mille ID on 5, 10 ja 15
+
+DELETE FROM eteppan
+WHERE id IN (5, 10, 15);
+
+tõestus:
+	
+SELECT * FROM eteppan WHERE id BETWEEN 0 AND 20;
+
+1|John|Doe|johndoe@example.com|Honda|Civic|2022|22000.0
+2|Jane|Doe|janedoe@example.com|Toyota|Corolla|2021|19000.0
+3|Your|Name|youremail@example.com|Tesla|Model 3|2023|50000.0
+4|Erik|Teppan|erik.teppan2004@gmail.com.|Zaporozhets|Model 3|2023|50000.0
+6|Menard|Garnson|mgarnson1@a8.net|BMW|X5|40.248.246.62|16836850.0
+7|Sherilyn|Rivers|srivers2@mayoclinic.com|Chevrolet|Express 2500|49.181.189.228|74066392.0
+8|Ferd|Djordjevic|fdjordjevic3@ca.gov|GMC|Sierra 1500|81.82.66.177|64745291.0
+9|Vally|Uttley|vuttley4@ucoz.com|GMC|Savana 3500|88.172.229.102|14342075.0
+11|Reggis|Stormont|rstormont6@plala.or.jp|Chrysler|LHS|113.175.190.39|8318852.0
+12|Ludwig|Airdrie|lairdrie7@java.com|Citro?n|SRX|38.86.47.157|78972727.0
+13|Roy|Miller|rmiller8@sina.com.cn|Pontiac|Grand Am|227.250.122.31|50659435.0
+14|Lyda|Manolov|lmanolov9@scribd.com|Maybach|62|146.229.129.125|36050094.0
+16|El|Leathwood|eleathwoodb@4shared.com|Toyota|Tacoma|86.168.131.120|47082434.0
+17|Colene|Iacomettii|ciacomettiic@spotify.com|Mitsubishi|Chariot|120.114.226.124|42543291.0
+18|Alika|Blethin|ablethind@theatlantic.com|Toyota|TundraMax|239.62.221.38|83055865.0
+19|Lizbeth|Sayse|lsaysee@bloglovin.com|Chevrolet|Colorado|18.187.224.237|16553496.0
+20|Rozamond|Kitteman|rkittemanf@businessweek.com|BMW|325|176.10.172.199|20187314.0
+
+5. Kuva read, kus on ainult ID, perenimi, automark ja aasta, sorteeri ID järgi kasvavalt
+
+SELECT id, last_name, car_make, car_year
+FROM eteppan
+ORDER BY id ASC;
+
+tõestus:
+1|Doe|Honda|2022
+2|Doe|Toyota|2021
+3|Name|Tesla|2023
+4|Teppan|Zaporozhets|2023
+6|Garnson|BMW|40.248.246.62
+7|Rivers|Chevrolet|49.181.189.228
+8|Djordjevic|GMC|81.82.66.177
+9|Uttley|GMC|88.172.229.102
+11|Stormont|Chrysler|113.175.190.39
+12|Airdrie|Citro?n|38.86.47.157
+13|Miller|Pontiac|227.250.122.31
+14|Manolov|Maybach|146.229.129.125
+16|Leathwood|Toyota|86.168.131.120
+17|Iacomettii|Mitsubishi|120.114.226.124
+
+6. Kuva 10 rida autosid, kus kliendi perenimi hakkab sama algustähega, mis sul, sorteeri autod aasta järgi kahanevalt
+
+SELECT *
+FROM eteppan
+WHERE last_name LIKE 'first_letter%'
+ORDER BY car_year DESC
+LIMIT 10;
+
+tõestus:
+
+1|Doe|Honda|2022
+2|Doe|Toyota|2021
+3|Name|Tesla|2023
+4|Teppan|Zaporozhets|2023
+6|Garnson|BMW|40.248.246.62
+7|Rivers|Chevrolet|49.181.189.228
+8|Djordjevic|GMC|81.82.66.177
+9|Uttley|GMC|88.172.229.102
+11|Stormont|Chrysler|113.175.190.39
+
+7. Kuva 2 vabalt valitud automarki sisaldavad read ja ületavad mingit summat
+
+SELECT *
+FROM eteppan
+WHERE car_make IN ('Audi', 'BMW') AND car_price > 20000;
+
+tõestus:
+6|Menard|Garnson|mgarnson1@a8.net|BMW|X5|40.248.246.62|16836850.0
+20|Rozamond|Kitteman|rkittemanf@businessweek.com|BMW|325|176.10.172.199|20187314.0
+53|Johna|Frackiewicz|jfrackiewicz1g@biblegateway.com|BMW|3 Series|5.129.44.188|42045285.0
+72|Stevena|Izak|sizak1z@cafepress.com|Audi|Allroad|171.53.236.31|41381056.0
+77|Bridie|Bewshaw|bbewshaw24@jalbum.net|Audi|A7|86.140.107.11|15092531.0
+81|Hallie|Fennelly|hfennelly28@fastcompany.com|BMW|Z4 M|248.244.143.9|99700443.0
+115|Elle|Rawlins|erawlins36@nymag.com|BMW|X5 M|22.175.120.93|57785135.0
+142|Elliot|Borthram|eborthram3x@soup.io|Audi|Q5|191.86.176.25|15833496.0
+156|Florentia|Mynard|fmynard4b@google.es|Audi|TT|237.186.41.35|48551757.0
+163|Jose|Donnett|jdonnett4i@netlog.com|Audi|Allroad|195.108.26.98|95207310.0
+174|Fanny|Domanski|fdomanski4t@opera.com|BMW|M3|144.10.43.45|75069969.0
+182|Vivyan|Jermyn|vjermyn51@nasa.gov|Audi|Quattro|123.96.226.40|34885035.0
+
+SQLite3 ÜLESANNE 3
