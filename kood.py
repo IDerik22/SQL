@@ -64,6 +64,12 @@ def query_7():
     c.execute("DELETE FROM eteppan")
     conn.commit()
     print("{} kirjet kustutati".format(c.rowcount))
+    
+def query_all():
+    c.execute("SELECT * FROM eteppan")
+    rows = c.fetchall()
+    for row in rows:
+        print(row)
 
 
 
@@ -74,6 +80,7 @@ functions.append(query_4)
 functions.append(query_5)
 functions.append(query_6)
 functions.append(query_7)
+functions.append(query_all)
 
 
 
