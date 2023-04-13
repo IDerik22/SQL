@@ -1,103 +1,128 @@
 import tkinter as tk
+from tkinter import messagebox
 import sqlite3
 
-# Connect to the database
-conn = sqlite3.connect('kalkulaator.db')
-c = conn.cursor()
+class Calculator:
+    def __init__(self, master):
+        
+          
+        master.title("Calculator")
+        self.master = master
+        self.count = 0
 
-# Create the table if it does not exist
-c.execute('''CREATE TABLE IF NOT EXISTS calculations
-             (num1 REAL, num2 REAL, operation TEXT, result REAL)''')
+        self.num1_entry = tk.Entry(master, width=10)
+        self.num1_entry.grid(row=0, column=0)
 
-# Define the calculator functions
-def add(num1, num2):
-    return num1 + num2
+        self.num2_entry = tk.Entry(master, width=10)
+        self.num2_entry.grid(row=0, column=2)
 
-def subtract(num1, num2):
-    return num1 - num2
+        # Initialize the operation_var attribute
+        self.operation_var = tk.StringVar(master)
+        self.operation_var.set("+")  # default value
 
-def multiply(num1, num2):
-    return num1 * num2
+        # Create the operation dropdown menu
+        self.operation_dropdown = tk.OptionMenu(master, self.operation_var, "+", "-", "*", "/")
+        self.operation_dropdown.grid(row=0, column=1)
 
-def divide(num1, num2):
-    return num1 / num2
+        # Create the calculate button
+        self.calculate_button = tk.Button(master, text="Calculate", command=self.calculate)
+        self.calculate_button.grid(row=1, column=2)
 
-# Define the calculate function
-def calculate():
-    num1 = float(num1_entry.get())
-    num2 = float(num2_entry.get())
-    operation = operation_var.get()
-    if operation == "+":
-        result = add(num1, num2)
-    elif operation == "-":
-        result = subtract(num1, num2)
-    elif operation == "*":
-        result = multiply(num1, num2)
-    elif operation == "/":
-        result = divide(num1, num2)
-    result_label.config(text=result)
-    num1_entry.delete(0, tk.END)
-    num2_entry.delete(0, tk.END)
-    # Store the calculation in the database
-    c.execute("INSERT INTO calculations VALUES (?, ?, ?, ?)", (num1, num2, operation, result))
-    conn.commit()
-    # Add the calculation to the history list
-    calc_history.append(f"{num1} {operation} {num2} = {result}")
-    # Clear the history text widget
-    history_text.delete('1.0', tk.END)
-    # Update the history text widget with the new history list
-    for history_item in calc_history:
-        history_text.insert(tk.END, history_item + "\n")
+        # Create the result label
+        self.result_label = tk.Label(master, text="")
+        self.result_label.grid(row=1, column=0)
 
-# Define the function to toggle the history
-def update_history():
-    global show_history_button
-    if show_history_button["text"] == "Show History":
-        show_history_button["text"] = "Hide History"
-        for history_item in calc_history:
-            history_text.insert(tk.END, history_item + "\n")
-    else:
-        show_history_button["text"] = "Show History"
-        history_text.delete('1.0', tk.END)
+        # Create the history text widget and the show/hide history button
+        self.history_text = tk.Text(master, height=10, width=20)
+        self.history_text.grid(row=2, column=0, columnspan=3)
 
-# Create the main window
-root = tk.Tk()
-root.title("Calculator")
+        self.show_history_button = tk.Button(master, text="Show History", command=self.toggle_history)
+        self.show_history_button.grid(row=3, column=0, columnspan=2)
 
-# Create the number entry fields
-num1_entry = tk.Entry(root)
-num1_entry.grid(row=0, column=0)
+        self.delete_history_button = tk.Button(master, text="Delete History", command=self.delete_history)
+        self.delete_history_button.grid(row=3, column=2)
+        self.count_label = tk.Label(master, text="Count: 0")
+        self.count_label.grid(row=4, column=0)
+        self.count_label.config(text=f"Count: {self.count}")
 
-num2_entry = tk.Entry(root)
-num2_entry.grid(row=0, column=2)
 
-# Create the operation dropdown menu
-operation_var = tk.StringVar(root)
-operation_var.set("+") # default value
+        master.geometry("400x400")
+        
+        
 
-operation_dropdown = tk.OptionMenu(root, operation_var, "+", "-", "*", "/")
-operation_dropdown.grid(row=0, column=1)
+        # Connect to the database and create the table if it does not exist
+        self.conn = sqlite3.connect('calc_history.db')
+        self.c = self.conn.cursor()
+        self.c.execute('''CREATE TABLE IF NOT EXISTS calculations
+            (num1 REAL, num2 REAL, operation TEXT, result REAL)''')
 
-# Create the calculate button
-calculate_button = tk.Button(root, text="Calculate", command=calculate)
-calculate_button.grid(row=1, column=2)
+    def calculate(self):
+        
 
-# Create the result label
-result_label = tk.Label(root, text="")
-result_label.grid(row=1, column=0)
+        # Retrieve the input values and operation
+        num1 = float(self.num1_entry.get())
+        num2 = float(self.num2_entry.get())
+        operation = self.operation_var.get()
 
-# Create the history text widget
-history_text = tk.Text(root, height=5, width=30)
-history_text.grid(row=2, column=0, columnspan=3)
+        # Perform the calculation and update the result label
+        if operation == "+":
+            result = num1 + num2
+        elif operation == "-":
+            result = num1 - num2
+        elif operation == "*":
+            result = num1 * num2
+        elif operation == "/":
+            result = num1 / num2
+            
+        self.count += 1  # increment the count
+        self.update_count_display(num1, num2, operation, result)  # update the count display
 
-# Create the toggle
-show_history_button = tk.Button(root, text="Show History", command=update_history)
-show_history_button.grid(row=3, column=0, columnspan=3)
+        # Update the result label and the history
+        self.result_label.config(text=str(result))
+        history_str = f"{num1} {operation} {num2} = {result}\n"
+        self.history_text.insert(tk.END, history_str)
 
-calc_history = []
-for row in c.execute("SELECT * FROM calculations"):
-    num1, num2, operation, result = row
-    calc_history.append(f"{num1} {operation} {num2} = {result}")
+    def update_count_display(self, num1, num2, operation, result):
+        count_str = f"Total Calculations: {self.count}"
+        self.count_label.config(text=count_str)
 
-conn.close()
-root.mainloop()
+        # Save the calculation to the database
+        self.c.execute("INSERT INTO calculations VALUES (?, ?, ?, ?)", (num1, num2, operation, result))
+        self.conn.commit()
+        
+        
+    def show_help(self):
+        messagebox.showinfo("Help", "Sisestage numbrisisestusväljadele kaks numbrit, valige rippmenüüst toiming ja klõpsake arvutuse tegemiseks nuppu 'Calculate'. Tulemus kuvatakse sildil. Klõpsake nuppu 'Show History', et vaadata varasemaid arvutusi. 'Delete History' kustutab ajaloost kõik varasemad tehted ära.  PÄRAST SEDA LUGEDES PANE RAKENDUS MIINUSEST ALLA JA AVA UUESTI, MUIDU EI LASE NUMBREID SISESTADA")
+    
+    def toggle_history(self):
+        # Toggle the state of the show/hide history button and update the history text widget
+        if self.show_history_button["text"] == "Show History":
+            self.show_history_button["text"] = "Hide History"
+            self.c.execute("SELECT * FROM calculations")
+            calc_history = [f"{row[0]} {row[2]} {row[1]} = {row[3]}" for row in self.c.fetchall()]
+            for history_item in calc_history:
+                self.history_text.insert(tk.END, history_item + "\n")
+        else:
+            self.show_history_button["text"] = "Show History"
+            self.history_text.delete('1.0', tk.END)
+            
+    def delete_history(self):
+    # Confirm with user before deleting all records
+        if messagebox.askyesno("Delete History", "Kindel, et tahad tehete ajaloo ära kustutada?"):
+            # Delete all records from the calculations table
+            self.c.execute("DELETE FROM calculations")
+            self.conn.commit()
+
+            # Clear the history text widget
+            self.history_text.delete('1.0', tk.END)
+
+
+    def __del__(self):
+        # Close the database connection when the object is destroyed
+        self.conn.close()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    calc = Calculator(root)
+    calc.show_help()
+    root.mainloop()
